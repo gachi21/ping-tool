@@ -22,8 +22,13 @@ jobs:
           gradle-version: "8.9"
       - name: Build release APK
         run: gradle assembleRelease --no-daemon
-      - name: Rename APK
-        run: cp app/build/outputs/apk/release/app-release.apk Android-Ping-Tool.apk
+      - name: Locate APK
+        shell: bash
+        run: |
+          APK=$(find app/build -type f -name "*.apk" | head -n 1)
+          test -n "$APK"
+          cp "$APK" Android-Ping-Tool.apk
+          ls -lh Android-Ping-Tool.apk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
