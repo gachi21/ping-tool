@@ -78,8 +78,8 @@ class MainActivity : Activity() {
      val ms=((System.nanoTime()-t)/1_000_000.0).roundToInt().toLong()
      if(ok){
       received++;min=minOf(min,ms);max=maxOf(max,ms);total+=ms
-      val jit=if(prev<0)0 else abs(ms-prev);prev=ms
-      line("reply from "+a.hostAddress+": seq="+seq+" time="+ms+"ms jitter="+jit+"ms")
+      prev=ms
+      line("reply from "+a.hostAddress+" seq="+seq+" time="+ms+"ms")
      }else line("timeout from "+h+": seq="+seq+" timeout="+to+"ms")
     }catch(e:Exception){line("error: seq="+seq+" "+e.javaClass.simpleName+": "+(e.message?:"unreachable"))}
     seq++;stats()
@@ -90,7 +90,7 @@ class MainActivity : Activity() {
  }
  private fun stopPing(){running.set(false);start.text="START";inputs(true)}
  private fun reset(){sent=0;received=0;min=Long.MAX_VALUE;max=0;total=0;prev=-1;log.clear();output.text="";stats()}
- private fun line(s:String){val now=SimpleDateFormat("HH:mm:ss",Locale.US).format(Date());log.append("[").append(now).append("]  ").append(s).append('\n');ui.post{output.text=log.toString();(output.parent as ScrollView).fullScroll(View.FOCUS_DOWN)}}
+ private fun line(s:String){log.append(s).append('\n');ui.post{output.text=log.toString();(output.parent as ScrollView).fullScroll(View.FOCUS_DOWN)}}
  private fun stats(){ui.post{val loss=if(sent==0)0 else ((sent-received)*100.0/sent).roundToInt();val av=if(received==0)"—" else (total/received).toString()+"ms";stats.text="Packets "+received+"/"+sent+" • Loss "+loss+"% • Min "+(if(min==Long.MAX_VALUE)"—" else min.toString()+"ms")+" • Avg "+av+" • Max "+(if(received==0)"—" else max.toString()+"ms")+" • Jitter live"}}
  private fun inputs(e:Boolean){host.isEnabled=e;count.isEnabled=e;interval.isEnabled=e;timeout.isEnabled=e}
  private fun edit(h:String,v:String)=EditText(this).apply{hint=h;setText(v);setTextColor(Color.WHITE);setHintTextColor(Color.GRAY);setSingleLine(true);setPadding(10,0,10,0)}
